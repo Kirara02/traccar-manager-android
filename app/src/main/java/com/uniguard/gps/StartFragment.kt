@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 @file:Suppress("DEPRECATION")
-package org.traccar.manager
+package com.uniguard.gps
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
@@ -36,6 +36,7 @@ import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
+import com.uniguard.gps.R
 
 class StartFragment : Fragment(), View.OnClickListener {
 

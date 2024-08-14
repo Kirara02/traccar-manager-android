@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 @file:Suppress("DEPRECATION")
-package org.traccar.manager
+package com.uniguard.gps
 
 import android.content.Intent
 import android.os.Build
@@ -24,6 +24,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.preference.PreferenceManager
+import com.uniguard.gps.R
 
 class MainActivity : AppCompatActivity() {
 
@@ -46,7 +47,12 @@ class MainActivity : AppCompatActivity() {
         if (PreferenceManager.getDefaultSharedPreferences(this).contains(PREFERENCE_URL)) {
             fragmentManager.beginTransaction().add(android.R.id.content, MainFragment()).commit()
         } else {
-            fragmentManager.beginTransaction().add(android.R.id.content, StartFragment()).commit()
+//            fragmentManager.beginTransaction().add(android.R.id.content, StartFragment()).commit()
+            PreferenceManager.getDefaultSharedPreferences(this)
+                .edit().putString(PREFERENCE_URL, getString(R.string.server_url)).apply()
+            fragmentManager
+                .beginTransaction().replace(android.R.id.content, MainFragment())
+                .commitAllowingStateLoss()
         }
     }
 
