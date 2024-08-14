@@ -1,8 +1,14 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
-    id 'com.google.gms.google-services'
-    id 'com.google.firebase.crashlytics'
+}
+
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file("/home/kirarabernstein/Learn/traccar-manager-android/app/key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+} else {
+    throw new FileNotFoundException("Keystore properties file not found: " + keystorePropertiesFile)
 }
 
 android {
@@ -14,8 +20,30 @@ android {
         versionCode 1
         versionName '1.0'
         multiDexEnabled true
+
+        setProperty("archivesBaseName","gps")
     }
     namespace 'com.uniguard.gps'
+
+    signingConfigs {
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled true
+        }
+        debug {
+            // Configure debug signing if needed, otherwise default debug keystore will be used
+            signingConfig signingConfigs.release // Optional if you want to sign debug builds
+        }
+    }
 
     buildFeatures {
         flavorDimensions = ['default']
@@ -23,9 +51,7 @@ android {
     productFlavors {
         regular {
             isDefault = true
-            ext.enableCrashlytics = false
         }
-        google
     }
 
     compileOptions {
@@ -47,23 +73,4 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.13.1'
     implementation 'androidx.biometric:biometric-ktx:1.2.0-alpha05'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    googleImplementation platform('com.google.firebase:firebase-bom:33.1.2')
-    googleImplementation 'com.google.firebase:firebase-analytics'
-    googleImplementation 'com.google.firebase:firebase-crashlytics'
-    googleImplementation 'com.google.firebase:firebase-messaging'
-}
-tasks.register('copyFirebaseConfig', Copy) {
-    from '../../environment/google-services'
-    into '.'
-    include 'traccar-manager-android.json'
-    rename('traccar-manager-android.json', 'google-services.json')
-}
-afterEvaluate {
-    tasks.matching { it.name.contains('Google') }.configureEach { task ->
-        if (task.name.contains('Regular')) {
-            task.enabled false
-        } else {
-            task.dependsOn copyFirebaseConfig
-        }
-    }
 }
