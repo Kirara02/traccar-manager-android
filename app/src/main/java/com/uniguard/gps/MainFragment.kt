@@ -35,7 +35,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.preference.PreferenceManager
-import com.uniguard.gps.R
 
 class MainFragment : WebViewFragment() {
 
@@ -59,10 +58,10 @@ class MainFragment : WebViewFragment() {
             } else if (message.startsWith("logout")) {
                 SecurityManager.deleteToken(activity)
             } else if (message.startsWith("server")) {
-                val url = message.substring(7)
-                PreferenceManager.getDefaultSharedPreferences(activity)
-                    .edit().putString(MainActivity.PREFERENCE_URL, url).apply()
-                activity.runOnUiThread { loadPage() }
+//                val url = message.substring(7)
+//                PreferenceManager.getDefaultSharedPreferences(activity)
+//                    .edit().putString(MainActivity.PREFERENCE_URL, url).apply()
+//                activity.runOnUiThread { loadPage() }
             }
         }
     }
@@ -276,7 +275,11 @@ class MainFragment : WebViewFragment() {
             Environment.DIRECTORY_DOWNLOADS,
             URLUtil.guessFileName(url, contentDisposition, mimeType),
         )
-        val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        val downloadManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        } else {
+            activity.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        }
         downloadManager.enqueue(request)
     }
 
